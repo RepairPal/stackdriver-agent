@@ -1,14 +1,18 @@
-from debian:jessie
+from ubuntu:16.04
 
-LABEL org.label-schema.vcs-url="https://github.com/wikiwi/stackdriver-agent" \
-      org.label-schema.vendor=wikiwi.io \
-      org.label-schema.name=stackdriver-agent \
-      io.wikiwi.license=MIT
+RUN apt-get update && apt-get -y install --no-install-recommends \
+    vim-tiny \
+    iproute2 \
+    curl \
+    ca-certificates \
+    lsb-release \
+    gnupg2 \
+  && update-alternatives --install /usr/bin/vim vim /usr/bin/vim.tiny 1 
 
-RUN apt-get update && apt-get install -y curl && \
-    curl -o /etc/apt/sources.list.d/stackdriver.list https://repo.stackdriver.com/jessie.list && \
-    curl --silent https://app.stackdriver.com/RPM-GPG-KEY-stackdriver | apt-key add - && \
-    apt-get update && apt-get install -y stackdriver-agent libhiredis-dev libpq-dev
+RUN curl -sSO https://dl.google.com/cloudagents/install-monitoring-agent.sh && \
+    bash install-monitoring-agent.sh && \
+    apt-get autoclean && apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY collectd-gcm.conf.tmpl /opt/stackdriver/collectd/etc/collectd-gcm.conf.tmpl
 COPY collectd.conf.tmpl /opt/stackdriver/collectd/etc/collectd.conf.tmpl

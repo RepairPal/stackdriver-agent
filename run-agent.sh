@@ -12,13 +12,13 @@ set -eo pipefail
 for f in /opt/configurator/*.sh; do source $f; done
 
 if curl metadata.google.internal -i > /dev/null 2>&1; then
-  /opt/stackdriver/stack-config --write-gcm --no-start
+  echo "Running on GCP Instance"
 else
   if [ -z "${STACKDRIVER_API_KEY}" ]; then
     echo "Need to specify STACKDRIVER_API_KEY as an environment variable."
     exit 1
   else
-    /opt/stackdriver/stack-config --api-key "${STACKDRIVER_API_KEY}" --no-start
+    echo "Not Running on GCP Instance - Found STACKDRIVER_API_KEY"
   fi
 fi
 
